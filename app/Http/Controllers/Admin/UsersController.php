@@ -6,6 +6,7 @@ use Course\Http\Controllers\Controller;
 use Course\Http\Requests\CreateUserRequest;
 use Course\Http\Requests\UpdateUserRequest;
 use Course\User;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Session;
@@ -102,11 +103,23 @@ class UsersController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy($id,Request $request)
 	{
+        $message='El usuario '.$this->user->fullName.' fué eliminado';
+
         $this->user->delete();
-        Session::flash('message','El usuario '.$this->user->fullName.' fué eliminado');
-        return \Redirect::route('admin.users.index');
+
+        if($request->ajax()){
+            return response()->json([
+                'id'      => $this->user->id,
+                'message' => $message
+            ]);
+        }
+        else{
+            Session::flash('message',$message);
+            return \Redirect::route('admin.users.index');
+        }
+
 	}
 
 }
